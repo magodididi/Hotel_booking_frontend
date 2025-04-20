@@ -1,6 +1,6 @@
 import {
     Typography, Button, AutoComplete, Select, DatePicker, Spin, Alert,
-    Row, Col, Space, message, Form
+    Row, Col, Space, message, Form, Flex
 } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useEffect, useMemo, useState } from 'react';
@@ -10,6 +10,7 @@ import axios from 'axios';
 import HotelCard from './HotelCard';
 import HotelFormModal from './HotelFormModal';
 import { Hotel } from '../interfaces/hotel';
+import AppLayout from '../components/Layout';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -29,7 +30,6 @@ const HotelList: React.FC = () => {
     const [editingHotel, setEditingHotel] = useState<Hotel | null>(null);
     const [form] = Form.useForm();
 
-    // Загрузка отелей
     useEffect(() => {
         axios.get<Hotel[]>('/hotels')
             .then(res => {
@@ -40,11 +40,9 @@ const HotelList: React.FC = () => {
             .finally(() => setLoading(false));
     }, []);
 
-    // Города и категории
     const cities = useMemo(() => Array.from(new Set(hotels.map(h => h.city))), [hotels]);
     const categories = useMemo(() => Array.from(new Set(hotels.map(h => h.category))), [hotels]);
 
-    // Фильтрация
     useEffect(() => {
         let result = [...hotels];
 
@@ -56,7 +54,6 @@ const HotelList: React.FC = () => {
         setFilteredHotels(result);
     }, [selectedCity, selectedCategory, selectedDate, searchQuery, hotels]);
 
-    // Открытие формы
     const showModal = (hotel?: Hotel) => {
         if (hotel) {
             setEditingHotel(hotel);
@@ -73,7 +70,6 @@ const HotelList: React.FC = () => {
         form.resetFields();
     };
 
-    // Сохранение (создание / обновление)
     const handleSave = async () => {
         try {
             const values = await form.validateFields();
@@ -87,15 +83,13 @@ const HotelList: React.FC = () => {
                 message.success("Отель создан");
             }
 
-
             const updated = await axios.get<Hotel[]>('/hotels');
             setHotels(updated.data);
+            setFilteredHotels(updated.data);
             setSelectedCity(undefined);
             setSelectedCategory(undefined);
             setSelectedDate(null);
             setSearchQuery("");
-            setFilteredHotels(updated.data);
-
             setIsModalVisible(false);
         } catch {
             message.error("Ошибка при сохранении");
@@ -117,70 +111,96 @@ const HotelList: React.FC = () => {
     if (error) return <Alert message={error} type="error" showIcon style={{ marginTop: 20 }} />;
 
     return (
-        <div style={{ padding: 24 }}>
-            <Title level={2}>🏨 Список отелей</Title>
+        <AppLayout>
+            <div style={{ padding: 24 }}>
+                <Flex justify="space-between" align="center" style={{ flexWrap: 'wrap', gap: 16 }}>
+                    <Title level={2} style={{ margin: 0 }}>Список отелей</Title>
+                </Flex>
+                <div style={{ margin: '24px 0' }}>
+                    <Flex
+                        justify="space-between"
+                        align="middle"
+                        wrap
+                        style={{ marginBottom: 24 }}
+                    >
+                        <Flex gap="middle" wrap>
+                            <AutoComplete
+                                style={{ width: 200 }}
+                                options={hotels.map(h => ({ value: h.name }))}
+                                onSelect={setSearchQuery}
+                                onSearch={setSearchQuery}
+                                placeholder="Поиск по названию"
+                            />
+                            <Select
+                                style={{ width: 160 }}
+                                placeholder="Город"
+                                allowClear
+                                onChange={setSelectedCity}
+                                value={selectedCity}
+                            >
+                                {cities.map(city => (
+                                    <Option key={city} value={city}>{city}</Option>
+                                ))}
+                            </Select>
+                            <Select
+                                style={{ width: 160 }}
+                                placeholder="Категория"
+                                allowClear
+                                onChange={setSelectedCategory}
+                                value={selectedCategory}
+                            >
+                                {categories.map(cat => (
+                                    <Option key={cat} value={cat}>{cat}</Option>
+                                ))}
+                            </Select>
+                            <DatePicker
+                                style={{
+                                    width: 160,
+                                    padding: '0 8px',
+                                    height: 32,
+                                    lineHeight: '40px'
+                                }}
+                                placeholder="До даты"
+                                onChange={setSelectedDate}
+                                value={selectedDate}
+                            />
 
-            <Button
-                icon={<PlusOutlined />}
-                type="primary"
-                onClick={() => showModal()}
-                style={{ marginBottom: 24 }}
-            >
-                Добавить отель
-            </Button>
+                        </Flex>
+                        <Button
+                            icon={<PlusOutlined />}
+                            type="primary"
+                            size="large"
+                            style={{ minWidth: 180 }}
+                            onClick={() => showModal()}
+                        >
+                            Добавить отель
+                        </Button>
+                    </Flex>
 
-            <Space wrap style={{ marginBottom: 24 }}>
-                <AutoComplete
-                    style={{ width: 200 }}
-                    options={hotels.map(h => ({ value: h.name }))}
-                    onSelect={setSearchQuery}
-                    onSearch={setSearchQuery}
-                    placeholder="Поиск по названию"
+                </div>
+
+                <Row gutter={[24, 24]}>
+                    {filteredHotels.map((hotel, index) => (
+                        <Col key={hotel.id} xs={24} md={12} lg={8}>
+                            <HotelCard
+                                hotel={hotel}
+                                index={index}
+                                onEdit={showModal}
+                                onDelete={handleDelete}
+                            />
+                        </Col>
+                    ))}
+                </Row>
+
+                <HotelFormModal
+                    open={isModalVisible}
+                    onCancel={handleCancel}
+                    onSave={handleSave}
+                    form={form}
+                    editingHotel={editingHotel}
                 />
-                <Select
-                    style={{ width: 160 }}
-                    placeholder="Город"
-                    allowClear
-                    onChange={setSelectedCity}
-                >
-                    {cities.map(city => <Option key={city} value={city}>{city}</Option>)}
-                </Select>
-                <Select
-                    style={{ width: 160 }}
-                    placeholder="Категория"
-                    allowClear
-                    onChange={setSelectedCategory}
-                >
-                    {categories.map(cat => <Option key={cat} value={cat}>{cat}</Option>)}
-                </Select>
-                <DatePicker
-                    style={{ width: 180 }}
-                    placeholder="До даты"
-                    onChange={setSelectedDate}
-                />
-            </Space>
-
-            <Row gutter={[24, 24]}>
-                {filteredHotels.map((hotel, index) => (
-                    <Col key={hotel.id} xs={24} md={12} lg={8}>
-                        <HotelCard
-                            hotel={hotel}
-                            index={index}
-                            onEdit={showModal}
-                            onDelete={handleDelete}
-                        />
-                    </Col>
-                ))}
-            </Row>
-
-            <HotelFormModal
-                open={isModalVisible}
-                onCancel={handleCancel}
-                onSave={handleSave}
-                form={form}
-                editingHotel={editingHotel}
-            />
-        </div>
+            </div>
+        </AppLayout>
     );
 };
 

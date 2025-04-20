@@ -7,7 +7,7 @@ interface Props {
     room: Room | null;
     hotelId: string;
     onClose: () => void;
-    onSuccess?: () => void;
+    onSuccess?: (room: Room | 'deleted') => void;
 }
 
 const RoomModal: React.FC<Props> = ({ open, room, hotelId, onClose, onSuccess }) => {
@@ -15,19 +15,18 @@ const RoomModal: React.FC<Props> = ({ open, room, hotelId, onClose, onSuccess })
 
     useEffect(() => {
         if (room) {
-            form.setFieldsValue(room);
+            form.setFieldsValue({ ...room });
         } else {
             form.resetFields();
         }
     }, [room, form]);
-
 
     const handleSubmit = async (values: any) => {
         const payload = {
             roomNumber: values.roomNumber,
             type: values.type,
             price: values.price,
-            hotelId: hotelId,
+            hotelId,
         };
 
         try {
@@ -38,10 +37,11 @@ const RoomModal: React.FC<Props> = ({ open, room, hotelId, onClose, onSuccess })
             });
 
             if (!res.ok) throw new Error('Ошибка сохранения');
+            const newRoom = await res.json();
 
             message.success(`Комната успешно ${room ? 'обновлена' : 'создана'}`);
             onClose();
-            onSuccess?.();
+            onSuccess?.(newRoom);
         } catch (err) {
             message.error((err as Error).message || 'Ошибка');
         }
@@ -59,7 +59,7 @@ const RoomModal: React.FC<Props> = ({ open, room, hotelId, onClose, onSuccess })
 
             message.success('Комната удалена');
             onClose();
-            onSuccess?.();
+            onSuccess?.('deleted');
         } catch (err) {
             message.error((err as Error).message || 'Ошибка удаления');
         }
@@ -116,7 +116,7 @@ const RoomModal: React.FC<Props> = ({ open, room, hotelId, onClose, onSuccess })
                                 okText="Да"
                                 cancelText="Нет"
                             >
-                                <Button danger>Удалить</Button>
+                                <Button danger>Удалить комнату</Button>
                             </Popconfirm>
                         )}
                     </Space>
