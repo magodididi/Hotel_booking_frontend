@@ -1,6 +1,6 @@
 import { Modal, Button, Space, Popconfirm, Form, Input, InputNumber, Select, message } from 'antd';
-import { Room } from '../interfaces/hotel';
-import { useEffect } from 'react';
+import { Room, Facility } from '../interfaces/hotel';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 
 interface Props {
     open: boolean;
@@ -13,6 +13,9 @@ interface Props {
 const RoomModal: React.FC<Props> = ({ open, room, hotelId, onClose, onSuccess }) => {
     const [form] = Form.useForm();
 
+    const [facilities, setFacilities] = useState<Facility[]>([]);
+    const [selectedFacilityIds, setSelectedFacilityIds] = useState<string[]>([]);
+
     useEffect(() => {
         if (room) {
             form.setFieldsValue({ ...room });
@@ -20,6 +23,24 @@ const RoomModal: React.FC<Props> = ({ open, room, hotelId, onClose, onSuccess })
             form.resetFields();
         }
     }, [room, form]);
+
+    useEffect(() => {
+        const fetchFacilities = async () => {
+            const res = await fetch('/facilities');
+            const data = await res.json();
+            setFacilities(data);
+        };
+
+        fetchFacilities();
+    }, []);
+
+    useEffect(() => {
+        if (room) {
+            setSelectedFacilityIds(room.facilities.map(f => f.id));
+        } else {
+            setSelectedFacilityIds([]);
+        }
+    }, [room]);
 
     const handleSubmit = async (values: any) => {
         const payload = {
@@ -37,11 +58,23 @@ const RoomModal: React.FC<Props> = ({ open, room, hotelId, onClose, onSuccess })
             });
 
             if (!res.ok) throw new Error('Ошибка сохранения');
-            const newRoom = await res.json();
+            const updatedRoom: Room = await res.json();
+
+            // Обновление удобств
+            const existingIds = room?.facilities.map(f => f.id) || [];
+            const toAdd = selectedFacilityIds.filter(id => !existingIds.includes(id));
+            const toRemove = existingIds.filter(id => !selectedFacilityIds.includes(id));
+
+            await Promise.all([
+                ...toAdd.map(id =>
+                    fetch(`/facilities/${updatedRoom.id}/add/${id}`, { method: 'POST' })),
+                ...toRemove.map(id =>
+                    fetch(`/facilities/${updatedRoom.id}/remove/${id}`, { method: 'DELETE' })),
+            ]);
 
             message.success(`Комната успешно ${room ? 'обновлена' : 'создана'}`);
             onClose();
-            onSuccess?.(newRoom);
+            onSuccess?.(updatedRoom);
         } catch (err) {
             message.error((err as Error).message || 'Ошибка');
         }
@@ -76,10 +109,22 @@ const RoomModal: React.FC<Props> = ({ open, room, hotelId, onClose, onSuccess })
                 <Form.Item
                     label="Номер комнаты"
                     name="roomNumber"
-                    rules={[{ required: true, message: 'Укажите номер' }]}
+                    rules={[
+                        { required: true, message: 'Укажите номер' },
+                        {
+                            validator: (_, value) => {
+                                if (!value || value < 1) {
+                                    return Promise.reject('Номер комнаты не может быть меньше 1');
+                                }
+                                return Promise.resolve();
+                            },
+                        },
+                    ]}
                 >
-                    <Input />
+                    <InputNumber min={1} style={{ width: '100%' }} />
                 </Form.Item>
+
+
 
                 <Form.Item
                     label="Тип"
@@ -88,9 +133,10 @@ const RoomModal: React.FC<Props> = ({ open, room, hotelId, onClose, onSuccess })
                 >
                     <Select
                         options={[
-                            { value: 'SINGLE', label: 'Одноместная' },
-                            { value: 'DOUBLE', label: 'Двухместная' },
-                            { value: 'SUITE', label: 'Люкс' },
+                            { value: 'SINGLE', label: 'Single' },
+                            { value: 'DOUBLE', label: 'Double' },
+                            { value: 'SUITE', label: 'Suite' },
+                            { value: 'FAMILY', label: 'Family' },  {/* Новый тип */}
                         ]}
                     />
                 </Form.Item>
@@ -101,6 +147,16 @@ const RoomModal: React.FC<Props> = ({ open, room, hotelId, onClose, onSuccess })
                     rules={[{ required: true, type: 'number', min: 0.1, message: 'Укажите цену больше 0' }]}
                 >
                     <InputNumber min={0.1} style={{ width: '100%' }} />
+                </Form.Item>
+
+                <Form.Item label="Удобства">
+                    <Select
+                        mode="multiple"
+                        value={selectedFacilityIds}
+                        onChange={setSelectedFacilityIds}
+                        options={facilities.map(f => ({ value: f.id, label: f.name }))}
+                        placeholder="Выберите удобства"
+                    />
                 </Form.Item>
 
                 <Form.Item>

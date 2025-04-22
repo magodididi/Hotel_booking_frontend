@@ -15,7 +15,7 @@ const AppLayout: React.FC<LayoutProps> = ({ children }) => {
             <Header style={{ backgroundColor: '#1890ff', padding: '0 20px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Title level={2} style={{ color: 'white', margin: 0 }}>
-                        <Link to="/" style={{ color: 'white' }}>Hotel-Bokking</Link>
+                        <Link to="/" style={{ color: 'white' }}>Hotel-Booking</Link>
                     </Title>
                     <Menu
                         mode="horizontal"
@@ -42,7 +42,7 @@ const AppLayout: React.FC<LayoutProps> = ({ children }) => {
                 {children}
             </Content>
             <Footer style={{ textAlign: 'center', backgroundColor: '#1890ff', color: 'white', padding: '20px' }}>
-                <p>&copy; {new Date().getFullYear()} Hotel-Bokking. Все права защищены.</p>
+                <p>&copy; {new Date().getFullYear()} Hotel-Booking. Все права защищены ДМ.</p>
             </Footer>
         </Layout>
     );

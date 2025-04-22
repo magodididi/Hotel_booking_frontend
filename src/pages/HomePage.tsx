@@ -17,7 +17,7 @@ const HomePage: React.FC = () => {
                 style={{ textAlign: 'center', padding: '50px 0', backgroundColor: '#f0f4f7' }}
             >
                 <Title level={2} style={{ marginBottom: '20px', color: '#1f1f1f' }}>
-                    Добро пожаловать в Hotel-Bokking
+                    Добро пожаловать в Hotel-Booking
                 </Title>
                 <Paragraph style={{ fontSize: '20px', color: '#555', marginBottom: '30px', lineHeight: '1.6' }}>
                     Мы предоставляем удобный сервис для работы с бронированием отелей по всему миру.

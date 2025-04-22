@@ -1,6 +1,6 @@
-import { Modal, Form, Input, Rate, Upload, Button } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import { Modal, Form, Input, InputNumber, Button } from 'antd';
 import { Hotel } from '../interfaces/hotel';
+import dayjs from 'dayjs';
 
 interface Props {
     open: boolean;
@@ -11,32 +11,73 @@ interface Props {
 }
 
 const HotelFormModal: React.FC<Props> = ({ open, onCancel, onSave, form, editingHotel }) => {
-    // Функция для обработки ввода категории (удаляем звездочки)
-    const handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value.replace(/\*/g, '');
-        form.setFieldsValue({ category: value });
-    };
-
     return (
         <Modal
             title={editingHotel ? "Редактировать отель" : "Добавить отель"}
             open={open}
             onCancel={onCancel}
-            onOk={onSave}
+            onOk={() => form.validateFields().then(onSave)}
             okText="Сохранить"
             cancelText="Отмена"
         >
             <Form form={form} layout="vertical">
-                <Form.Item name="name" label="Название" rules={[{ required: true }]}>
+                <Form.Item
+                    name="name"
+                    label="Название"
+                    rules={[
+                        { required: true, message: 'Пожалуйста, введите название' },
+                        { min: 2, message: 'Название должно содержать минимум 2 символа' }
+                    ]}
+                >
                     <Input />
                 </Form.Item>
-                <Form.Item name="city" label="Город" rules={[{ required: true }]}>
+
+                <Form.Item
+                    name="city"
+                    label="Город"
+                    rules={[
+                        { required: true, message: 'Пожалуйста, укажите город' },
+                        { min: 2, message: 'Город должен содержать минимум 2 символа' }
+                    ]}
+                >
                     <Input />
                 </Form.Item>
-                <Form.Item name="category" label="Категория" rules={[{ required: true }]}>
-                    <Input onChange={handleCategoryChange} />
+
+                <Form.Item
+                    name="category"
+                    label="Категория (1-5)"
+                    rules={[
+                        { required: true, message: 'Укажите категорию' },
+                        {
+                            type: 'number',
+                            min: 1,
+                            max: 5,
+                            message: 'Категория должна быть от 1 до 5',
+                        },
+                    ]}
+                >
+                    <InputNumber style={{ width: '100%' }} />
                 </Form.Item>
-                <Form.Item name="availableFromDate" label="Дата доступности" rules={[{ required: true }]}>
+
+                <Form.Item
+                    name="availableFromDate"
+                    label="Дата доступности"
+                    rules={[
+                        { required: true, message: 'Укажите дату' },
+                        {
+                            validator: (_, value) => {
+                                if (!value) return Promise.reject('Дата обязательна');
+                                const selectedDate = dayjs(value);
+                                const today = dayjs().startOf('day');
+                                if (selectedDate.isSame(today) || selectedDate.isAfter(today)) {
+                                    return Promise.resolve();
+                                }
+                                return Promise.reject('Дата должна быть сегодня или позже');
+                            }
+
+                        }
+                    ]}
+                >
                     <Input type="date" />
                 </Form.Item>
             </Form>

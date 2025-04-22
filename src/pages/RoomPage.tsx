@@ -15,7 +15,7 @@ import {
     Input,
     Collapse
 } from 'antd';
-import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { PlusOutlined, ReloadOutlined, ArrowLeftOutlined  } from '@ant-design/icons';
 import axios from 'axios';
 import RoomTable from '../components/RoomTable';
 import RoomModal from '../components/RoomModal';
@@ -25,6 +25,7 @@ import AppLayout from '../components/Layout';
 const { Title } = Typography;
 const { Option } = Select;
 const { Panel } = Collapse;
+
 
 const RoomPage: React.FC = () => {
     const { hotelId } = useParams<{ hotelId: string }>();
@@ -135,117 +136,80 @@ const RoomPage: React.FC = () => {
     return (
         <AppLayout>
             <div style={{ padding: '24px', backgroundColor: '#f4f7fa' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                     <Button
+                        icon={<ArrowLeftOutlined />}
                         onClick={() => navigate('/hotels')}
                         style={{
-                            backgroundColor: '#f0f2f5',
-                            color: '#555',
-                            border: '1px solid #d9d9d9',
                             borderRadius: '8px',
-                            padding: '6px 14px'
+                            backgroundColor: '#1890ff',
+                            color: '#fff',
+                            border: 'none',
+                            fontWeight: 500,
+                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
                         }}
                     >
                         Назад
                     </Button>
-                    <Title level={2} style={{ margin: 0, color: '#1f1f1f' }}>
+                    <Title level={3} style={{ margin: 0, color: '#1f1f1f' }}>
                         Комнаты отеля «{hotel.name}»
                     </Title>
                 </div>
 
-                <Card
-                    bordered
-                    style={{
-                        marginBottom: '24px',
-                        borderRadius: '12px',
-                        backgroundColor: '#fff',
-                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                        padding: '24px'
-                    }}
-                >
-                    <Collapse defaultActiveKey={['1']} accordion>
-                        <Panel header="Фильтры" key="1" style={{ borderRadius: '8px' }}>
-                            <Row gutter={[16, 16]}>
-                                <Col xs={24} sm={12} md={6}>
-                                    <Input
-                                        placeholder="Поиск по номеру"
-                                        value={searchRoomNumber}
-                                        allowClear
-                                        onChange={(e) => setSearchRoomNumber(e.target.value)}
-                                        style={{
-                                            width: '100%',
-                                            borderRadius: '8px',
-                                            border: '1px solid #d9d9d9',
-                                            height: '38px'
-                                        }}
-                                    />
-                                </Col>
-                                <Col xs={12} sm={6} md={4}>
-                                    <Select
-                                        placeholder="Тип комнаты"
-                                        value={selectedType}
-                                        onChange={setSelectedType}
-                                        allowClear
-                                        style={{
-                                            width: '100%',
-                                            borderRadius: '8px',
-                                            border: '1px solid #d9d9d9',
-                                            height: '38px'
-                                        }}
-                                    >
-                                        {availableRoomTypes.map((type) => (
-                                            <Option key={type} value={type}>{type}</Option>
-                                        ))}
-                                    </Select>
-                                </Col>
-                                <Col xs={12} sm={6} md={4}>
-                                    <InputNumber
-                                        placeholder="Мин. цена"
-                                        value={minPrice}
-                                        onChange={(value) => typeof value === 'number' ? setMinPrice(value) : setMinPrice(undefined)}
-                                        style={{
-                                            width: '100%',
-                                            borderRadius: '8px',
-                                            border: '1px solid #d9d9d9',
-                                            height: '38px'
-                                        }}
-                                    />
-                                </Col>
-                                <Col xs={12} sm={6} md={4}>
-                                    <InputNumber
-                                        placeholder="Макс. цена"
-                                        value={maxPrice}
-                                        onChange={(value) => typeof value === 'number' ? setMaxPrice(value) : setMaxPrice(undefined)}
-                                        style={{
-                                            width: '100%',
-                                            borderRadius: '8px',
-                                            border: '1px solid #d9d9d9',
-                                            height: '38px'
-                                        }}
-                                    />
-                                </Col>
-                                <Col xs={24} sm={12} md={6}>
-                                    <Button
-                                        icon={<ReloadOutlined />}
-                                        onClick={resetFilters}
-                                        style={{
-                                            width: '100%',
-                                            borderRadius: '8px',
-                                            padding: '8px',
-                                            border: '1px solid #d9d9d9',
-                                            backgroundColor: '#f5f5f5',
-                                            color: '#595959',
-                                        }}
-                                    >
-                                        Сбросить фильтры
-                                    </Button>
-                                </Col>
-                            </Row>
-                        </Panel>
-                    </Collapse>
-                </Card>
+                <Collapse defaultActiveKey={['1']} accordion style={{ borderRadius: '8px', marginBottom: 16 }}>
+                    <Panel header="Фильтры" key="1">
+                        <Row gutter={[16, 16]}>
+                            <Col xs={24} sm={12} md={6}>
+                                <Input
+                                    placeholder="Поиск по номеру"
+                                    value={searchRoomNumber}
+                                    allowClear
+                                    onChange={(e) => setSearchRoomNumber(e.target.value)}
+                                />
+                            </Col>
+                            <Col xs={12} sm={6} md={4}>
+                                <Select
+                                    placeholder="Тип комнаты"
+                                    value={selectedType}
+                                    onChange={setSelectedType}
+                                    allowClear
+                                    style={{ width: '100%' }}
+                                >
+                                    {availableRoomTypes.map((type) => (
+                                        <Option key={type} value={type}>{type}</Option>
+                                    ))}
+                                </Select>
+                            </Col>
+                            <Col xs={12} sm={6} md={4}>
+                                <InputNumber
+                                    placeholder="Мин. цена"
+                                    value={minPrice}
+                                    onChange={(value) => typeof value === 'number' ? setMinPrice(value) : setMinPrice(undefined)}
+                                    style={{ width: '100%' }}
+                                />
+                            </Col>
+                            <Col xs={12} sm={6} md={4}>
+                                <InputNumber
+                                    placeholder="Макс. цена"
+                                    value={maxPrice}
+                                    onChange={(value) => typeof value === 'number' ? setMaxPrice(value) : setMaxPrice(undefined)}
+                                    style={{ width: '100%' }}
+                                />
+                            </Col>
+                            <Col xs={24} sm={12} md={6}>
+                                <Button
+                                    icon={<ReloadOutlined />}
+                                    onClick={resetFilters}
+                                    style={{ width: '100%' }}
+                                >
+                                    Сбросить фильтры
+                                </Button>
+                            </Col>
+                        </Row>
+                    </Panel>
+                </Collapse>
 
-                <Space style={{ marginBottom: 24 }}>
+                <div style={{ marginBottom: 24 }}>
                     <Button
                         icon={<PlusOutlined />}
                         type="primary"
@@ -259,7 +223,7 @@ const RoomPage: React.FC = () => {
                     >
                         Добавить комнату
                     </Button>
-                </Space>
+                </div>
 
                 <RoomTable rooms={filteredRooms} onRoomClick={openRoomModal} />
 

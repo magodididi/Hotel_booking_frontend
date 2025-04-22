@@ -18,7 +18,7 @@ const RoomTable: React.FC<{ rooms: Room[], onRoomClick: (room: Room) => void }> 
             {
                 title: 'Цена',
                 dataIndex: 'price',
-                render: (price: number) => <span><DollarOutlined /> {price} ₽</span>,
+                render: (price: number) => <span>{price} $</span>,
             },
             {
                 title: 'Удобства',
