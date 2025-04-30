@@ -132,8 +132,8 @@ const HomePage: React.FC = () => {
                         width="560"
                         height="315"
                         src="https://www.youtube.com/embed/WvjAYp4NkOg"
-                        title="Hotel-Bokking demo"
-                        frameBorder="0"
+                        title="Hotel-Booking demo"
+                        style={{ border: 'none' }}
                         allowFullScreen
                     />
                 </div>

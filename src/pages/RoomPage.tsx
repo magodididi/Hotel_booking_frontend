@@ -5,13 +5,11 @@ import {
     Button,
     Select,
     InputNumber,
-    Space,
     message,
     Spin,
     Alert,
     Row,
     Col,
-    Card,
     Input,
     Collapse
 } from 'antd';
@@ -54,11 +52,15 @@ const RoomPage: React.FC = () => {
                 }
 
                 const [hotelRes, roomsRes] = await Promise.all([
-                    axios.get<Hotel>(`/hotels/${hotelId}`),
-                    axios.get<Room[]>(`/rooms/hotel/${hotelId}`),
+                    axios.get<Hotel>(`/api/hotels/${hotelId}`),
+                    axios.get(`/api/rooms/hotel/${hotelId}`),
                 ]);
 
-                const sortedRooms = roomsRes.data.sort((a, b) => a.roomNumber.localeCompare(b.roomNumber, undefined, { numeric: true }));
+                const roomsData = Array.isArray(roomsRes.data) ? roomsRes.data : [];
+                const sortedRooms = roomsData.sort((a, b) =>
+                    a.roomNumber.localeCompare(b.roomNumber, undefined, { numeric: true })
+                );
+
                 setHotel(hotelRes.data);
                 setRooms(sortedRooms);
                 setFilteredRooms(sortedRooms);
@@ -72,6 +74,7 @@ const RoomPage: React.FC = () => {
 
         if (hotelId) fetchData();
     }, [hotelId]);
+
 
     useEffect(() => {
         const applyFilters = () => {
@@ -108,7 +111,7 @@ const RoomPage: React.FC = () => {
 
     const refreshRooms = async () => {
         try {
-            const res = await axios.get<Room[]>(`/rooms/hotel/${hotelId}`);
+            const res = await axios.get<Room[]>(`/api/rooms/hotel/${hotelId}`);
             const sorted = res.data.sort((a, b) => a.roomNumber.localeCompare(b.roomNumber, undefined, { numeric: true }));
             setRooms(sorted);
         } catch {

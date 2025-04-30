@@ -1,6 +1,6 @@
-import { Modal, Button, Space, Popconfirm, Form, Input, InputNumber, Select, message } from 'antd';
+import { Modal, Button, Space, Popconfirm, Form, InputNumber, Select, message } from 'antd';
 import { Room, Facility } from '../interfaces/hotel';
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect} from 'react';
 
 interface Props {
     open: boolean;
@@ -26,7 +26,7 @@ const RoomModal: React.FC<Props> = ({ open, room, hotelId, onClose, onSuccess })
 
     useEffect(() => {
         const fetchFacilities = async () => {
-            const res = await fetch('/facilities');
+            const res = await fetch('/api/facilities');
             const data = await res.json();
             setFacilities(data);
         };
@@ -51,7 +51,7 @@ const RoomModal: React.FC<Props> = ({ open, room, hotelId, onClose, onSuccess })
         };
 
         try {
-            const res = await fetch(room ? `/rooms/${room.id}` : '/rooms', {
+            const res = await fetch(room ? `/api/rooms/${room.id}` : '/api/rooms', {
                 method: room ? 'PUT' : 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -67,9 +67,9 @@ const RoomModal: React.FC<Props> = ({ open, room, hotelId, onClose, onSuccess })
 
             await Promise.all([
                 ...toAdd.map(id =>
-                    fetch(`/facilities/${updatedRoom.id}/add/${id}`, { method: 'POST' })),
+                    fetch(`/api/facilities/${updatedRoom.id}/add/${id}`, { method: 'POST' })),
                 ...toRemove.map(id =>
-                    fetch(`/facilities/${updatedRoom.id}/remove/${id}`, { method: 'DELETE' })),
+                    fetch(`/api/facilities/${updatedRoom.id}/remove/${id}`, { method: 'DELETE' })),
             ]);
 
             message.success(`Комната успешно ${room ? 'обновлена' : 'создана'}`);
@@ -84,7 +84,7 @@ const RoomModal: React.FC<Props> = ({ open, room, hotelId, onClose, onSuccess })
         if (!room) return;
 
         try {
-            const res = await fetch(`/rooms/${room.id}`, {
+            const res = await fetch(`/api/rooms/${room.id}`, {
                 method: 'DELETE',
             });
 

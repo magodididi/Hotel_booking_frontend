@@ -1,5 +1,4 @@
 import { Table, Tag, Space } from 'antd';
-import { DollarOutlined } from '@ant-design/icons';
 import { Room, Facility } from '../interfaces/hotel';
 
 const RoomTable: React.FC<{ rooms: Room[], onRoomClick: (room: Room) => void }> = ({ rooms, onRoomClick }) => (

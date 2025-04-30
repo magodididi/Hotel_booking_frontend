@@ -139,7 +139,7 @@ const HotelCard: React.FC<Props> = ({ hotel, index, onEdit, onDelete }) => {
                     type="default"
                     icon={<EyeOutlined />}
                     onClick={() => localRooms.length > 0
-                        ? window.location.href = `/rooms/${hotel.id}`
+                        ? window.location.href = `/api/rooms/hotel/${hotel.id}`
                         : handleOpenRoomModal()}
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}

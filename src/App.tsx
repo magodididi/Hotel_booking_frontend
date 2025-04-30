@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
-import HotelList from './components/HotelList';
+import HotelList from './pages/HotelList';
 import RoomPage from './pages/RoomPage';
 import SupportPage from './pages/SupportPage';
 import 'antd/dist/reset.css';

@@ -1,14 +1,14 @@
 import {
     Typography, Button, AutoComplete, Select, DatePicker, Spin, Alert,
-    Row, Col, Space, message, Form, Flex
+    Row, Col, message, Form, Flex
 } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useEffect, useMemo, useState } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import axios from 'axios';
 
-import HotelCard from './HotelCard';
-import HotelFormModal from './HotelFormModal';
+import HotelCard from '../components/HotelCard';
+import HotelFormModal from '../components/HotelFormModal';
 import { Hotel } from '../interfaces/hotel';
 import AppLayout from '../components/Layout';
 
@@ -31,8 +31,9 @@ const HotelList: React.FC = () => {
     const [form] = Form.useForm();
 
     useEffect(() => {
-        axios.get<Hotel[]>('/hotels')
+        axios.get('/api/hotels')
             .then(res => {
+                console.log("API response:", res.data);
                 setHotels(res.data);
                 setFilteredHotels(res.data);
             })
@@ -40,8 +41,24 @@ const HotelList: React.FC = () => {
             .finally(() => setLoading(false));
     }, []);
 
-    const cities = useMemo(() => Array.from(new Set(hotels.map(h => h.city))), [hotels]);
-    const categories = useMemo(() => Array.from(new Set(hotels.map(h => h.category))), [hotels]);
+
+    const cities = useMemo(() => {
+        return Array.isArray(hotels)
+            ? Array.from(new Set(hotels.map(h => h.city)))
+            : [];
+    }, [hotels]);
+
+    const categories = useMemo(() => {
+        return Array.isArray(hotels)
+            ? Array.from(new Set(hotels.map(h => h.category)))
+            : [];
+    }, [hotels]);
+
+    const hotelOptions = useMemo(() => {
+        return Array.isArray(hotels)
+            ? hotels.map(h => ({ value: h.name }))
+            : [];
+    }, [hotels]);
 
     useEffect(() => {
         let result = [...hotels];
@@ -76,16 +93,22 @@ const HotelList: React.FC = () => {
             const payload = { ...values };
 
             if (editingHotel) {
-                await axios.put(`/hotels/${editingHotel.id}`, payload);
+                await axios.put(`/api/hotels/${editingHotel.id}`, payload);
                 message.success("Отель обновлен");
             } else {
-                await axios.post("/hotels", payload);
+                await axios.post("/api/hotels", payload);
                 message.success("Отель создан");
             }
 
-            const updated = await axios.get<Hotel[]>('/hotels');
-            setHotels(updated.data);
-            setFilteredHotels(updated.data);
+            const updated = await axios.get('/api/hotels');
+            const data = updated.data;
+            if (Array.isArray(data)) {
+                setHotels(data);
+                setFilteredHotels(data);
+            } else {
+                setError("Ошибка при загрузке обновлённых данных");
+            }
+
             setSelectedCity(undefined);
             setSelectedCategory(undefined);
             setSelectedDate(null);
@@ -98,7 +121,7 @@ const HotelList: React.FC = () => {
 
     const handleDelete = async (id: string) => {
         try {
-            await axios.delete(`/hotels/${id}`);
+            await axios.delete(`/api/hotels/${id}`);
             message.success("Отель удалён");
             setHotels(prev => prev.filter(h => h.id !== id));
             setFilteredHotels(prev => prev.filter(h => h.id !== id));
@@ -126,7 +149,7 @@ const HotelList: React.FC = () => {
                         <Flex gap="middle" wrap>
                             <AutoComplete
                                 style={{ width: 200 }}
-                                options={hotels.map(h => ({ value: h.name }))}
+                                options={hotelOptions}
                                 onSelect={setSearchQuery}
                                 onSearch={setSearchQuery}
                                 placeholder="Поиск по названию"
@@ -164,7 +187,6 @@ const HotelList: React.FC = () => {
                                 onChange={setSelectedDate}
                                 value={selectedDate}
                             />
-
                         </Flex>
                         <Button
                             icon={<PlusOutlined />}
@@ -176,7 +198,6 @@ const HotelList: React.FC = () => {
                             Добавить отель
                         </Button>
                     </Flex>
-
                 </div>
 
                 <Row gutter={[24, 24]}>

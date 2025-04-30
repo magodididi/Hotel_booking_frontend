@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Typography, Input, Button, Card, Row, Col, message, Spin } from 'antd';
+import { Typography, Input, Button, Card, Row, Col, message} from 'antd';
 import { MailOutlined, MessageOutlined, WechatOutlined, PhoneOutlined } from '@ant-design/icons'; // Используем WechatOutlined
 import { motion } from 'framer-motion';
 import AppLayout from '../components/Layout';
@@ -22,7 +22,6 @@ const SupportPage: React.FC = () => {
         try {
             setLoading(true);
 
-            // Отправка данных на сервер для обработки
             const response = await axios.post('/api/send-message', {
                 email,
                 message: messageContent,
@@ -67,11 +66,11 @@ const SupportPage: React.FC = () => {
                 <Row justify="center" gutter={[24, 24]}>
                     <Col xs={24} sm={20} md={14} lg={10}>
                         <Card
-                            bordered={false}
                             style={{
                                 borderRadius: '10px',
                                 boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                                 padding: '30px',
+                                border: 'none',
                             }}
                         >
                             <Title level={4}>Связаться с нами</Title>
