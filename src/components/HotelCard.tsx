@@ -7,6 +7,7 @@ import {
     Popconfirm,
     Button
 } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import {
     EditOutlined,
     DeleteOutlined,
@@ -30,6 +31,7 @@ const HotelCard: React.FC<Props> = ({ hotel, index, onEdit, onDelete }) => {
     const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
     const [localRooms, setLocalRooms] = useState<Room[]>(hotel.rooms);
+    const navigate = useNavigate();
 
     const handleCloseRoomModal = () => {
         setIsRoomModalOpen(false);
@@ -139,7 +141,7 @@ const HotelCard: React.FC<Props> = ({ hotel, index, onEdit, onDelete }) => {
                     type="default"
                     icon={<EyeOutlined />}
                     onClick={() => localRooms.length > 0
-                        ? window.location.href = `/api/rooms/hotel/${hotel.id}`
+                        ? navigate(`/rooms/${hotel.id}`)
                         : handleOpenRoomModal()}
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}

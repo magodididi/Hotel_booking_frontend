@@ -28,7 +28,32 @@ const RoomModal: React.FC<Props> = ({ open, room, hotelId, onClose, onSuccess })
         const fetchFacilities = async () => {
             const res = await fetch('/api/facilities');
             const data = await res.json();
-            setFacilities(data);
+
+            // Если пусто — заполним начальными удобствами
+            if (data.length === 0) {
+                const defaultFacilities = [
+                    { name: 'Wi-Fi' },
+                    { name: 'Swimmig pool' },
+                    { name: 'Bar' },
+                    { name: 'Dogs/Cats' },
+                ];
+
+                await Promise.all(
+                    defaultFacilities.map(facility =>
+                        fetch('/api/facilities', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(facility),
+                        })
+                    )
+                );
+
+                const res2 = await fetch('/api/facilities');
+                const facilitiesAfterInsert = await res2.json();
+                setFacilities(facilitiesAfterInsert);
+            } else {
+                setFacilities(data);
+            }
         };
 
         fetchFacilities();
