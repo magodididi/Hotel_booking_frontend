@@ -26,7 +26,7 @@ const RoomModal: React.FC<Props> = ({ open, room, hotelId, onClose, onSuccess })
 
     useEffect(() => {
         const fetchFacilities = async () => {
-            const res = await fetch('/api/facilities');
+            const res = await fetch('https://hotel-v2-final-production.up.railway.app/facilities');
             const data = await res.json();
 
             // Если пусто — заполним начальными удобствами
@@ -40,7 +40,7 @@ const RoomModal: React.FC<Props> = ({ open, room, hotelId, onClose, onSuccess })
 
                 await Promise.all(
                     defaultFacilities.map(facility =>
-                        fetch('/api/facilities', {
+                        fetch('https://hotel-v2-final-production.up.railway.app/facilities', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(facility),
@@ -48,7 +48,7 @@ const RoomModal: React.FC<Props> = ({ open, room, hotelId, onClose, onSuccess })
                     )
                 );
 
-                const res2 = await fetch('/api/facilities');
+                const res2 = await fetch('https://hotel-v2-final-production.up.railway.app/facilities');
                 const facilitiesAfterInsert = await res2.json();
                 setFacilities(facilitiesAfterInsert);
             } else {
@@ -76,7 +76,7 @@ const RoomModal: React.FC<Props> = ({ open, room, hotelId, onClose, onSuccess })
         };
 
         try {
-            const res = await fetch(room ? `/api/rooms/${room.id}` : '/api/rooms', {
+            const res = await fetch(room ? `https://hotel-v2-final-production.up.railway.app/rooms/${room.id}` : 'https://hotel-v2-final-production.up.railway.app/rooms', {
                 method: room ? 'PUT' : 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -92,9 +92,9 @@ const RoomModal: React.FC<Props> = ({ open, room, hotelId, onClose, onSuccess })
 
             await Promise.all([
                 ...toAdd.map(id =>
-                    fetch(`/api/facilities/${updatedRoom.id}/add/${id}`, { method: 'POST' })),
+                    fetch(`https://hotel-v2-final-production.up.railway.app/facilities/${updatedRoom.id}/add/${id}`, { method: 'POST' })),
                 ...toRemove.map(id =>
-                    fetch(`/api/facilities/${updatedRoom.id}/remove/${id}`, { method: 'DELETE' })),
+                    fetch(`https://hotel-v2-final-production.up.railway.app/facilities/${updatedRoom.id}/remove/${id}`, { method: 'DELETE' })),
             ]);
 
             message.success(`Комната успешно ${room ? 'обновлена' : 'создана'}`);
@@ -109,7 +109,7 @@ const RoomModal: React.FC<Props> = ({ open, room, hotelId, onClose, onSuccess })
         if (!room) return;
 
         try {
-            const res = await fetch(`/api/rooms/${room.id}`, {
+            const res = await fetch(`https://hotel-v2-final-production.up.railway.app/rooms/${room.id}`, {
                 method: 'DELETE',
             });
 

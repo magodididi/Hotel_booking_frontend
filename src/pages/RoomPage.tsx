@@ -52,8 +52,8 @@ const RoomPage: React.FC = () => {
                 }
 
                 const [hotelRes, roomsRes] = await Promise.all([
-                    axios.get<Hotel>(`/api/hotels/${hotelId}`),
-                    axios.get(`/api/rooms/hotel/${hotelId}`),
+                    axios.get<Hotel>(`https://hotel-v2-final-production.up.railway.app/hotels/${hotelId}`),
+                    axios.get(`https://hotel-v2-final-production.up.railway.app/rooms/hotel/${hotelId}`),
                 ]);
 
                 const roomsData = Array.isArray(roomsRes.data) ? roomsRes.data : [];
@@ -111,7 +111,7 @@ const RoomPage: React.FC = () => {
 
     const refreshRooms = async () => {
         try {
-            const res = await axios.get<Room[]>(`/api/rooms/hotel/${hotelId}`);
+            const res = await axios.get<Room[]>(`https://hotel-v2-final-production.up.railway.app/rooms/hotel/${hotelId}`);
             const sorted = res.data.sort((a, b) => a.roomNumber.localeCompare(b.roomNumber, undefined, { numeric: true }));
             setRooms(sorted);
         } catch {

@@ -22,7 +22,7 @@ const SupportPage: React.FC = () => {
         try {
             setLoading(true);
 
-            const response = await axios.post('/api/send-message', {
+            const response = await axios.post('https://hotel-v2-final-production.up.railway.app/send-message', {
                 email,
                 message: messageContent,
             });

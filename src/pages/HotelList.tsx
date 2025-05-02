@@ -31,7 +31,7 @@ const HotelList: React.FC = () => {
     const [form] = Form.useForm();
 
     useEffect(() => {
-        axios.get('/api/hotels')
+        axios.get('https://hotel-v2-final-production.up.railway.app/hotels')
             .then(res => {
                 console.log("API response:", res.data);
                 setHotels(res.data);
@@ -93,14 +93,14 @@ const HotelList: React.FC = () => {
             const payload = { ...values };
 
             if (editingHotel) {
-                await axios.put(`/api/hotels/${editingHotel.id}`, payload);
+                await axios.put(`https://hotel-v2-final-production.up.railway.app/hotels/${editingHotel.id}`, payload);
                 message.success("Отель обновлен");
             } else {
-                await axios.post("/api/hotels", payload);
+                await axios.post("https://hotel-v2-final-production.up.railway.app/hotels", payload);
                 message.success("Отель создан");
             }
 
-            const updated = await axios.get('/api/hotels');
+            const updated = await axios.get('https://hotel-v2-final-production.up.railway.app/hotels');
             const data = updated.data;
             if (Array.isArray(data)) {
                 setHotels(data);
@@ -121,7 +121,7 @@ const HotelList: React.FC = () => {
 
     const handleDelete = async (id: string) => {
         try {
-            await axios.delete(`/api/hotels/${id}`);
+            await axios.delete(`https://hotel-v2-final-production.up.railway.app/hotels/${id}`);
             message.success("Отель удалён");
             setHotels(prev => prev.filter(h => h.id !== id));
             setFilteredHotels(prev => prev.filter(h => h.id !== id));
