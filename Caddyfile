@@ -1,6 +1,6 @@
 :8080 {
     handle_path /api/* {
-        reverse_proxy http://backend:8080
+        reverse_proxy https://hotel-v2-final-production.up.railway.app
     }
 
     handle {
